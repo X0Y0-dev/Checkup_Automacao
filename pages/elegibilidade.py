@@ -435,7 +435,7 @@ def limpar():
 
 #region DATA E UNIDADE
 
-col_ant, col_data, col_prox, col_unidade = st.columns([0.5, 1.5, 0.5, 1.5])
+col_ant, col_data, col_prox, col_unidade = st.columns([0.35, 1.8, 0.35, 1.5])
 
 with col_ant:
     st.button(

@@ -447,7 +447,6 @@ with col_ant:
 with col_data:
     st.date_input(
         "Data",
-        value = date.today(),
         format = "DD/MM/YYYY", 
         key = "campo_data"
     )

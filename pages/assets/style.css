@@ -1,0 +1,97 @@
+/* Adicionar - azul (1º botão) */
+div[data-testid="stHorizontalBlock"] > div:nth-child(1) button[kind="secondary"] {
+    background-color: rgba(5, 67, 124, 0.7) !important;
+    border-color: #05437c !important;
+    color: rgb(0, 0, 0) !important;
+    transition: background-color 0.2s ease !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(1) button[kind="secondary"]:hover {
+    background-color: #05437c !important;
+    color: rgb(255, 255, 255) !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(1) button[kind="secondary"]:active {
+    background-color: #032d54 !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+/* Desfazer - vermelho (2º botão) */
+div[data-testid="stHorizontalBlock"] > div:nth-child(2) button[kind="secondary"] {
+    background-color: rgba(220, 53, 69, 0.4) !important;
+    border-color: #dc3545 !important;
+    color: rgb(0, 0, 0) !important;
+    transition: background-color 0.2s ease !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(2) button[kind="secondary"]:hover {
+    background-color: #dc3545 !important;
+    color: rgb(255, 255, 255) !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(2) button[kind="secondary"]:active {
+    background-color: #a71d2a !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+/* Baixar Planilha - verde (3º botão) */
+div[data-testid="stHorizontalBlock"] > div:nth-child(3) button[kind="secondary"] {
+    background-color: rgba(25, 135, 84, 0.4) !important;
+    border-color: #198754 !important;
+    color: rgb(0, 0, 0) !important;
+    transition: background-color 0.2s ease !important;
+    width: 100%;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(3) button[kind="secondary"]:hover {
+    background-color: #198754 !important;
+    color: rgb(255, 255, 255) !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(3) button[kind="secondary"]:active {
+    background-color: #0f5132 !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+/* Baixar Scripts - aqua (4º botão) */
+div[data-testid="stHorizontalBlock"] > div:nth-child(4) button[kind="secondary"] {
+    background-color: rgba(13, 202, 240, 0.4) !important;
+    border-color: #0dcaf0 !important;
+    color: rgb(0, 0, 0) !important;
+    transition: background-color 0.2s ease !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(4) button[kind="secondary"]:hover {
+    background-color: #0dcaf0 !important;
+    color: rgb(255, 255, 255) !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(4) button[kind="secondary"]:active {
+    background-color: #0896b3 !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+/* Recomeçar - amarelo (5º botão) */
+div[data-testid="stHorizontalBlock"] > div:nth-child(5) button[kind="secondary"] {
+    background-color: rgba(255, 193, 7, 0.4) !important;
+    border-color: #ffc107 !important;
+    color: black !important;
+    transition: background-color 0.2s ease !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(5) button[kind="secondary"]:hover {
+    background-color: #ffc107 !important;
+    color: rgb(255, 255, 255) !important;
+}
+div[data-testid="stHorizontalBlock"] > div:nth-child(5) button[kind="secondary"]:active {
+    background-color: #c49a06 !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+/* ── Download Buttons ──────────────────────────── */
+.stDownloadButton button {
+    background-color: rgba(106, 13, 173, 0.4) !important;
+    border-color: #6a0dad !important;
+    color: rgb(0, 0, 0) !important;
+    border-radius: 6px !important;
+    transition: background-color 0.2s ease !important;
+}
+.stDownloadButton button:hover {
+    background-color: #6a0dad !important;
+    color: rgb(255, 255, 255) !important;
+}
+.stDownloadButton button:active {
+    background-color: #4b0082 !important;
+    color: rgb(255, 255, 255) !important;
+}

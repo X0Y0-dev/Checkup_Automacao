@@ -12,7 +12,7 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.formatting.rule import FormulaRule
 
 from src.menu import render_header, render_sidebar
-from src.funcs import parse_checkup, identificar_empresa, identificar_convenio, gerar_txt_convenios, gerar_txt_brasilia, estilizar_header, estilizar_status, EMPRESAS
+from src.funcs import parse_checkup, identificar_empresa, identificar_convenio, gerar_txt_empresa, gerar_txt_convenios, gerar_txt_brasilia, estilizar_header, estilizar_status, EMPRESAS
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent

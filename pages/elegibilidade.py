@@ -340,6 +340,9 @@ def rollback():
 
     total = len(st.session_state.df)
     st.session_state.msg = f"↩️ Último lote desfeito ── total acumulado: {total}"
+    f"📍 Pacientes por unidade:\n\n"
+    f"Itaim: {(st.session_state.df['_unidade'] == 'Itaim').sum()}\n\n"
+    f"Brasília III: {(st.session_state.df['_unidade'] == 'Brasília III').sum()}"
 
 def finalizar():
     st.session_state.msg = f"📋 Total final: {len(st.session_state.df)} paciente(s)"

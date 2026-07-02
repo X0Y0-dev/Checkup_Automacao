@@ -42,8 +42,8 @@ verde = PatternFill(
 
 # Cor para status PENDENTE
 amarelo = PatternFill(
-    start_color = "FFD966",
-    end_color = "FFD966",
+    start_color = "FFFF00",
+    end_color = "FFFF00",
     fill_type = "solid"
 )
 

@@ -288,10 +288,10 @@ def adicionar():
     
     novo_df = parse_checkup(texto)
     if novo_df.empty:
-    st.session_state.msg = (
-        "⚠️ Nenhum paciente válido foi encontrado no texto informado."
-    )
-    return
+        st.session_state.msg = (
+            "⚠️ Nenhum paciente válido foi encontrado no texto informado."
+        )
+        return
     
     novo_df["Data"] = f"{dia_mes} ({dia_semana})"
     novo_df["_unidade"] = st.session_state.spinner_unidade

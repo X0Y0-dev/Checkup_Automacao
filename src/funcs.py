@@ -103,7 +103,7 @@ def parse_checkup(texto: str) -> pd.DataFrame:
         fim = inicios[idx + 1] if idx + 1 < len(inicios) else len(todas_linhas)
         linhas = [l for l in todas_linhas[inicio:fim] if l]
 
-        if len(linhas) < 6:
+        if len(linhas) < 5:
             continue
 
         try:
@@ -123,8 +123,8 @@ def parse_checkup(texto: str) -> pd.DataFrame:
             pacientes.append({
                 "Hora":       linhas[0] if len(linhas) > 0 else "?",
                 "Paciente":   linhas[1] if len(linhas) > 1 else "?",
-                "Convênio":   linhas[2] if len(linhas) > 4 else "?",
-                "Categoria":  linhas[3] if len(linhas) > 6 else "?",
+                "Convênio":   linhas[2] if len(linhas) > 2 else "?",
+                "Categoria":  linhas[3] if len(linhas) > 3 else "?",
                 "Status":     "",
             })
     return pd.DataFrame(pacientes)

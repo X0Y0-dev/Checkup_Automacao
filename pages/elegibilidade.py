@@ -25,7 +25,7 @@ render_sidebar()
 
 with st.expander("Configuração da **Agenda de Serviços**", expanded = False):
     st.markdown(f"""
-    Antes de utilizar o sistema, verifique se a **Agenda de Serviços** do TASY HTML5 está configurada na seguinte ordem:
+    Antes de utilizar o sistema, verifique se a **Agenda de Serviços** do TASY EMR está configurada na seguinte ordem:
 
     1. **Hora**
     2. **Paciente**

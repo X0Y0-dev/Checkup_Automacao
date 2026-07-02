@@ -80,20 +80,24 @@ STATUS_ESTILOS = {
 
 estado = {"df": pd.DataFrame(), "historico": []}
 
+hora_regex = re.compile(r'^\d{2}:\d{2}$')
+secoes_regex = re.compile(r'^\d+\s*/\s*\d+$')
+IDX_SECOES = 4
+
 #region FUNÇÕES E TRATAMENTO DE DADOS
 
 def parse_checkup(texto: str) -> pd.DataFrame:
 
-    # Rexes para tratamento de dados dos pacientes
+    # Normalização do texto recebido
     texto = re.sub(r'[\u200b\u200c\u200d\u202a\u202b\u202c\u202d\u202e\ufeff]', '', texto)
     texto = texto.replace('\r\n', '\n').replace('\r', '\n')
     todas_linhas = [l.strip() for l in texto.split('\n')]
 
     inicios = [
         i for i, linha in enumerate(todas_linhas)
-        if re.match(r'^\d{2}:\d{2}$', linha)
+        if hora_regex.match(linha)
         and i + 1 < len(todas_linhas)
-        and not re.match(r'^\d', todas_linhas[i + 1])
+        and not todas_linhas[i + 1][:1].isdigit()
     ]
 
     pacientes = []
@@ -103,30 +107,20 @@ def parse_checkup(texto: str) -> pd.DataFrame:
         fim = inicios[idx + 1] if idx + 1 < len(inicios) else len(todas_linhas)
         linhas = [l for l in todas_linhas[inicio:fim] if l]
 
-        if len(linhas) < 5:
+        if len(linhas) <= IDX_SECOES:
+            continue
+        if not secoes_regex.match(linhas[IDX_SECOES]):
             continue
 
-        try:
-            hora      = linhas[0]
-            paciente  = linhas[1]
-            convenio  = linhas[2]
-            categoria = linhas[3]
+        hora, paciente, convenio, categoria = linhas[:4]
 
-            pacientes.append({
-                "Hora":       hora,
-                "Paciente":   paciente,
-                "Convênio":   convenio,
-                "Categoria":  categoria,
-                "Status":     "",
-            })
-        except IndexError:
-            pacientes.append({
-                "Hora":       linhas[0] if len(linhas) > 0 else "?",
-                "Paciente":   linhas[1] if len(linhas) > 1 else "?",
-                "Convênio":   linhas[2] if len(linhas) > 2 else "?",
-                "Categoria":  linhas[3] if len(linhas) > 3 else "?",
-                "Status":     "",
-            })
+        pacientes.append({
+            "Hora": hora,
+            "Paciente": paciente,
+            "Convênio": convenio,
+            "Categoria": categoria,
+            "Status": "",
+        })
     return pd.DataFrame(pacientes)
 
 def identificar_empresa(convenio: str) -> str | None:

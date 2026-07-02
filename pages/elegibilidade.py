@@ -287,7 +287,7 @@ def adicionar():
         return
     
     novo_df = parse_checkup(texto)
-    if novo_df;empty:
+    if novo_df.empty:
         st.session_state.msg = (
             "⚠️ Nenhum paciente válido foi encontrado no texto informado."
         )

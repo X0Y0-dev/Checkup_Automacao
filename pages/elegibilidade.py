@@ -17,9 +17,7 @@ from src.funcs import parse_checkup, identificar_empresa, identificar_convenio, 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-css = pathlib.Path(BASE_DIR / "pages" / "assets" / "style.css").read_text()
-st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
-
+# Renderização da página
 render_header("Elegibilidade")
 render_sidebar()
 
@@ -228,7 +226,7 @@ DIAS_PTBR = {
     "Sunday": "Domingo"
 }
 
-
+# Inicialização das variáveis de estado
 if "df" not in st.session_state:
     st.session_state.df = pd.DataFrame()
 if "historico" not in st.session_state:
@@ -250,9 +248,9 @@ if "excel_bytes" not in st.session_state:
 if "zip_scripts" not in st.session_state:
     st.session_state.zip_scripts = b""
 
+# Importando o CSS na página
 def carregar_css(css_path):
-    with open(css_path) as f:
-        st.html(f"<style>{f.read()}</style>")
+    st.html(f"<style>{css_path.read_text(encoding='utf-8')}</style>")
 
 css_path = pathlib.Path(BASE_DIR / "pages" / "assets" / "style.css")
 carregar_css(css_path)
@@ -261,65 +259,73 @@ carregar_css(css_path)
 
 #region FUNCIONALIDADES
 
+# Função de voltar um dia no calendário
 def dia_anterior():
     st.session_state.campo_data -= timedelta(days=1)
 
+# Função de avançar um dia no calendário
 def dia_seguinte():
     st.session_state.campo_data += timedelta(days=1)
 
+# Função de adicionar dados para tratamento
 def adicionar():    
     texto = st.session_state.area.strip()
 
+    # Tratativa de erro caso o campo de texto esteja vazio
     if not texto:
         st.session_state.msg = "⚠️ Cole algum dado antes de adicionar!"
         return
-    
+
+    # Tratativa de erro caso o campo de data esteja vazio
     if not st.session_state.campo_data:
         st.session_state.msg = "⚠️ Selecione uma data antes de adicionar!"
         return
 
     data_selecionada = st.session_state.campo_data
     dia_mes = data_selecionada.strftime("%d/%m")
-    dia_semana = DIAS_PTBR[data_selecionada.strftime("%A")]
+    dia_semana = DIAS_PTBR[data_selecionada.strftime("%A")] # Traduzindo as datas de inglês para português com base no dicionário
 
+    # Tratativa de erro caso Damingo seja selecionado
     if dia_semana == "Domingo":
         st.session_state.msg = "🚨 ATENÇÃO 🚨 Check-up não é realizado aos domingos!"
         return
-    
+
+    # Tratativa de erro caso o texto passado não seja conforma a formatação esperada
     novo_df = parse_checkup(texto)
     if novo_df.empty:
-        st.session_state.msg = (
-            "⚠️ Nenhum paciente válido foi encontrado no texto informado."
-        )
+        st.session_state.msg = "⚠️ Nenhum paciente válido foi encontrado no texto informado."
         return
 
-    novo_df["Data"] = f"{dia_mes} ({dia_semana})"
+    novo_df["Data"] = f"{dia_mes} ({dia_semana})" # Salvando data na variável para exibir no output
     novo_df["_unidade"] = st.session_state.spinner_unidade
 
+    # Define quais colunas identificam unicamente um paciente
     chave = ["Paciente", "Convênio"]
-    novo_df = novo_df.drop_duplicates(subset = chave, keep = "first")
+    novo_df = novo_df.drop_duplicates(subset = chave, keep = "first") # Remoção de duplicatas, mantendo a primeira adicionada
 
+    # Só verifica duplicatas caso já existam registros salvos
     if not st.session_state.df.empty:
-        ja_existentes = st.session_state.df[chave].apply(tuple, axis=1)
-        chaves_novas = novo_df[chave].apply(tuple, axis=1)
-        duplicatas = novo_df[chaves_novas.isin(ja_existentes)]
+        ja_existentes = st.session_state.df[chave].apply(tuple, axis=1) # Conversão de colunhas-chaves em tuplas
+        chaves_novas = novo_df[chave].apply(tuple, axis=1) # Conversão dos novos registros em tuplas
+        duplicatas = novo_df[chaves_novas.isin(ja_existentes)] # Seleciona os registros cuja chave já existe no DataFrame principal
 
         if not duplicatas.empty:
-            nomes = ", ".join(duplicatas["Paciente"].tolist())
-            novo_df = novo_df[~chaves_novas.isin(ja_existentes)]
+            nomes = " || ".join(duplicatas["Paciente"].tolist()) # Junta os nomes dos pacientes duplicados para exibir na mensagem
+            novo_df = novo_df[~chaves_novas.isin(ja_existentes)] # Mantém apenas os registros que ainda não existem
 
+            # Exibição das duplicatas ignoradas
             if novo_df.empty:
-                st.session_state.msg = (
-                    f"⚠️ {len(duplicatas)} duplicata(s) ignorada(s): {nomes}"
-                )
+                st.session_state.msg = f"⚠️ {len(duplicatas)} duplicata(s) ignorada(s): {nomes}"
                 return
 
+    # Salvando estado para rollback
     st.session_state.historico.append(st.session_state.df.copy())
-    st.session_state.df = pd.concat([st.session_state.df, novo_df], ignore_index=True)
+    st.session_state.df = pd.concat([st.session_state.df, novo_df], ignore_index = True)
     st.session_state.area = ""
     st.session_state.btn_finalizar = False
     st.session_state.btn_rollback = False
 
+    # Exibição dos pacientes adicionados
     total = len(st.session_state.df)
     novos_count = len(novo_df)
 
@@ -331,10 +337,13 @@ def adicionar():
     )
 
 def rollback():
+
+    # Tratativa de erro caso não haja ações no histórico para desfazer
     if not st.session_state.historico:
         st.session_state.msg = "⚠️ Nada para desfazer!"
         return
 
+    # Apaga a última ação coluna ao dar rollback
     st.session_state.df = st.session_state.historico.pop()
 
     if st.session_state.df.empty:
@@ -344,6 +353,7 @@ def rollback():
     if not st.session_state.historico:
         st.session_state.btn_rollback = True
 
+    # Exibição do estado em que os dados se encontram
     total = len(st.session_state.df)
     st.session_state.msg = (
         f"↩️ Último lote desfeito ── total acumulado: {total}"
@@ -353,39 +363,68 @@ def rollback():
     )
 
 def finalizar():
-    st.session_state.msg = f"📋 Total final: {len(st.session_state.df)} paciente(s)"
+    st.session_state.msg = f"📋 Total final: {len(st.session_state.df)} paciente(s)" # Exibição do total de pacinetes tratados
 
-    colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status"]
-    st.session_state.df = st.session_state.df[colunas + ["_unidade"]]
+    colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status"] # Define quais colunas serão passadas para a planilha
+    st.session_state.df = st.session_state.df[colunas + ["_unidade"]] # Adiciona a coluna de 'Unidade' à planilha
+
+    # Adicionando filtro por Data e Hora na planilha, removendo apenas aqueles agendados às 10h
     st.session_state.df = st.session_state.df[~st.session_state.df["Hora"].str.startswith("10:")].sort_values(by = ["Data", "Hora"]).reset_index(drop=True)
 
     output = BytesIO()
 
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
 
-        df_bsb = st.session_state.df[st.session_state.df["_unidade"] == "Brasília III"].drop(columns="_unidade")
-        df_bsb_conv = df_bsb.copy()
+        """
+        ====================================
+        || Aba 'Brasília III' na planilha ||
+        ====================================
+        """
+        df_bsb = st.session_state.df[st.session_state.df["_unidade"] == "Brasília III"].drop(columns="_unidade") # Seleção apenas dos pacientes salvos em Brasília III
+        df_bsb_conv = df_bsb.copy() # Cria uma cópia para identificar quais convênios devem ser exportados
         df_bsb_conv["_convenio"] = df_bsb_conv["Convênio"].apply(identificar_convenio)
+
+        # Mantém apenas os convênios válidos
         df_bsb_conv = df_bsb_conv[df_bsb_conv["_convenio"].notna()]
         df_bsb_conv = df_bsb_conv.drop(columns="_convenio")
+
+        # Exporta a aba apenas se houver registros
         if not df_bsb_conv.empty:
             df_bsb_conv.to_excel(writer, sheet_name = "Brasília III", index = False)
             worksheet = writer.sheets["Brasília III"]
             estilizar_header(worksheet)
             estilizar_status(worksheet)
 
-        df_itaim = st.session_state.df[st.session_state.df["_unidade"] == "Itaim"].drop(columns = "_unidade").copy()
+        """
+        =============================
+        || Aba 'Itaim' na planilha ||
+        =============================
+        """
+        df_itaim = st.session_state.df[st.session_state.df["_unidade"] == "Itaim"].drop(columns = "_unidade").copy() # Seleção apenas dos pacientes salvos em Itaim
+
         if not df_itaim.empty:
+
+            """
+            Identifica se cada paciente pertence a uma empresa específica.
+            Quando não pertence, o valor permanece nulo e será tratado
+            posteriormente como um convênio comum.
+            """
             df_itaim["_sheet"] = df_itaim["Convênio"].apply(identificar_empresa)
 
+            # Registros sem empresa específica são destinados à aba "Convênios"
             df_convenios = df_itaim[df_itaim["_sheet"].isna()].drop(columns = "_sheet").copy()
+
+            # Filtra apenas os convênios válidos para exportação
             df_convenios["_convenio"] = df_convenios["Convênio"].apply(identificar_convenio)
             df_convenios = df_convenios[df_convenios["_convenio"].notna()]
+
+            # Exporta a aba "Convênios"
             df_convenios.drop(columns = "_convenio").to_excel(writer, sheet_name = "Convênios", index = False)
             worksheet = writer.sheets["Convênios"]
             estilizar_header(worksheet)
             estilizar_status(worksheet)
 
+            # Cria automaticamente uma aba para cada empresa encontrada
             for empresa in df_itaim["_sheet"].dropna().unique():
                 df_itaim[df_itaim["_sheet"] == empresa].drop(columns = "_sheet").to_excel(writer, sheet_name = empresa, index = False)
                 worksheet = writer.sheets[empresa]
@@ -397,38 +436,71 @@ def finalizar():
 
 def exportar():
     st.session_state.msg = "📄 Gerando arquivos de elegibilidade..."
-    st.session_state.arquivos_txt = {}
+    st.session_state.arquivos_txt = {} # Reinicia o dicionário que armazenará os conteúdos dos arquivos .txt
 
+    """
+    Cria uma cópia do DF principal para evitar alterações
+    acidentais nos dados exibidos na aplicação
+    """
     df = st.session_state.df.copy()
     df["_sheet"] = df["Convênio"].apply(identificar_empresa)
 
-    df_bsb = df[df["_unidade"] == "Brasília III"].drop(columns="_sheet").copy()
-    df_bsb["_convenio_nome"] = df_bsb["Convênio"].apply(identificar_convenio)
-    df_bsb = df_bsb[df_bsb["_convenio_nome"].notna()].drop(columns="_convenio_nome")  # <- filtro aplicado
+    """
+    =================================
+    || A|rquivos de 'BRasília III' ||
+    =================================
+    """
+    df_bsb = df[df["_unidade"] == "Brasília III"].drop(columns="_sheet").copy() # Seleção apenas dos pacientes salvos em Brasília
+
+    # Mantém apenas os convênios válidos para a geração do arquivo
+    df_bsb["_convenio_nome"] = df_bsb["Convênio"].apply(identificar_convenio) 
+    df_bsb = df_bsb[df_bsb["_convenio_nome"].notna()].drop(columns="_convenio_nome")
+
+    # Gera o arquivo apenas se houver registros
     if not df_bsb.empty:
         st.session_state.arquivos_txt["Brasilia_III.txt"] = gerar_txt_brasilia(df_bsb)
 
-    df_itaim = df[df["_unidade"] == "Itaim"].copy()
+    """
+    ===================================
+    || Arquivos das empresas (Itaim) ||
+    ===================================
+    """
+    df_itaim = df[df["_unidade"] == "Itaim"].copy() # Seleção apenas dos pacientes salvos em Itaim
 
+    # Para cada empresa encontrada, gera um .txt específico
     for empresa in df_itaim["_sheet"].dropna().unique():
         df_empresa = df_itaim[df_itaim["_sheet"] == empresa].drop(columns="_sheet").copy()
         st.session_state.arquivos_txt[f"{empresa}.txt"] = gerar_txt_empresa(df_empresa, empresa)
 
-    df_conv_itaim = df_itaim[df_itaim["_sheet"].isna()].drop(columns="_sheet").copy()
-    df_conv_itaim["_convenio_nome"] = df_conv_itaim["Convênio"].apply(identificar_convenio)
-    df_conv_itaim = df_conv_itaim[df_conv_itaim["_convenio_nome"].notna()]  # <- filtro aplicado
+    """
+    ====================================
+    || Arquivos dos convênios (Itaim) ||
+    ====================================
+    """
+    df_conv_itaim = df_itaim[df_itaim["_sheet"].isna()].drop(columns="_sheet").copy() # Seleção dos registros diferentes das empresas
+    df_conv_itaim["_convenio_nome"] = df_conv_itaim["Convênio"].apply(identificar_convenio) # Mantém apenas os convênios válidos
+    df_conv_itaim = df_conv_itaim[df_conv_itaim["_convenio_nome"].notna()]
+
+    # Gera o arquivo de convênios apenas se houver registros
     if not df_conv_itaim.empty:
         st.session_state.arquivos_txt["Convenios_Itaim.txt"] = gerar_txt_convenios(df_conv_itaim)
 
-    zip_buffer = BytesIO()
+    """
+    ==============================
+    || Compactação dos arquivos ||
+    ==============================
+    """
+    zip_buffer = BytesIO() # Cria um ZIP em memória com todos os .txt gerados
+    
     with ZipFile(zip_buffer, "w") as zip_file:
         for nome, conteudo in st.session_state.arquivos_txt.items():
             zip_file.writestr(nome, conteudo)
 
-    zip_buffer.seek(0)
-    st.session_state.zip_scripts = zip_buffer.getvalue()
+    zip_buffer.seek(0) # Posiciona o ponteiro no inicio do ZIP para leitura
+    st.session_state.zip_scripts = zip_buffer.getvalue() # Armazena o conteúdo do ZIP para diponibilizar o download
     st.session_state.msg = "✅ Arquivos exportados!"
 
+# Reset geral dos estados
 def limpar():
     st.session_state.df = pd.DataFrame()
     st.session_state.historico = []
@@ -446,6 +518,7 @@ def limpar():
 
 #region DATA E UNIDADE
 
+# Interface
 col_ant, col_data, col_prox, col_unidade = st.columns([0.35, 1.8, 0.35, 1.5])
 
 with col_ant:

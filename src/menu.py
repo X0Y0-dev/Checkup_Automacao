@@ -4,6 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 logo_path = BASE_DIR / "assets" / "logo_hsl.png"
 
+# PAGINAS DO SISTEMA
 PAGINAS = {
     "Home": "app.py",
     "Elegibilidade": "pages/elegibilidade.py",
@@ -12,7 +13,7 @@ PAGINAS = {
 # HEADER PADRONIZADO
 def render_header(text):
 
-    # estilização do header
+    # Estilização do header
     with st.container():
         st.markdown('<style>div.block-container{padding-top:2rem;}</style>',unsafe_allow_html = True)
         st.markdown('<div class = "header">', unsafe_allow_html = True)
@@ -32,11 +33,11 @@ def render_header(text):
 
 # SIDEBAR PADRONIZADA
 def render_sidebar():
-    # inicia em home
+    # Inicia em home
     if "menu_ativo" not in st.session_state:
         st.session_state.menu_ativo = "Home"
     
-    # logica pra muda o menu
+    # Lógica pra muda o menu
     def mudar_menu(menu):
         st.session_state.menu_ativo = menu
 
@@ -45,7 +46,7 @@ def render_sidebar():
 
         st.switch_page(PAGINAS[menu])
     
-    # estilização da sidebar
+    # Estilização da sidebar
     st.sidebar.markdown("""
     <style>
         section[data-testid = "stSidebar"] > div {
@@ -83,7 +84,7 @@ def render_sidebar():
     </style>
     """, unsafe_allow_html=True)
 
-    # botooes que piscam diferente :D
+    # Botões que piscam diferente
     for menu in PAGINAS.keys():
         if st.sidebar.button(menu,use_container_width=True,
             type = "primary" if st.session_state.menu_ativo == menu else "secondary",

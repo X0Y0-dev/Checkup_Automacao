@@ -180,7 +180,7 @@ def gerar_txt_convenios(df_convenios: pd.DataFrame) -> bytes:
                 linhas.append(f"    {row['Paciente']} - {row['Categoria']}")
         linhas.append("") # Linha em branco
 
-    return "\n".join(linhas).encode("utf-8")  # Retorna bytes ao invés de salvar
+    return "\n\n".join(linhas).encode("utf-8")  # Retorna bytes ao invés de salvar
 
 def gerar_txt_brasilia(df_brasilia: pd.DataFrame) -> bytes:
     
@@ -196,7 +196,7 @@ def gerar_txt_brasilia(df_brasilia: pd.DataFrame) -> bytes:
             linhas.append(f"    {row['Paciente']} - {row['Convênio']} - {row['Categoria']}")
         linhas.append("")
 
-    return "\n".join(linhas).encode("utf-8")  # Retorna bytes ao invés de salvar
+    return "\n\n".join(linhas).encode("utf-8")  # Retorna bytes ao invés de salvar
 
 def gerar_txt_empresa(df_empresa: pd.DataFrame, nome_empresa: str) -> bytes:
     linhas = []
@@ -211,7 +211,7 @@ def gerar_txt_empresa(df_empresa: pd.DataFrame, nome_empresa: str) -> bytes:
             linhas.append(f"    {row['Paciente']} - {row['Convênio']} - {row['Categoria']}")
         linhas.append("")
     
-    return "\n".join(linhas).encode("utf-8") # Retorna bytes ao invés de salvar
+    return "\n\n".join(linhas).encode("utf-8") # Retorna bytes ao invés de salvar
 
 def estilizar_header(worksheet):
 

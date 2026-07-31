@@ -446,9 +446,9 @@ def exportar():
     df["_sheet"] = df["Convênio"].apply(identificar_empresa)
 
     """
-    =================================
-    || A|rquivos de 'BRasília III' ||
-    =================================
+    ================================
+    || Arquivos de 'BRasília III' ||
+    ================================
     """
     df_bsb = df[df["_unidade"] == "Brasília III"].drop(columns="_sheet").copy() # Seleção apenas dos pacientes salvos em Brasília
 

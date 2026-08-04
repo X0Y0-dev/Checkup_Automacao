@@ -375,11 +375,10 @@ def finalizar():
 
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
 
-        """
-        ====================================
-        || Aba 'Brasília III' na planilha ||
-        ====================================
-        """
+        #====================================
+        #|| Aba 'Brasília III' na planilha ||
+        #====================================
+        
         df_bsb = st.session_state.df[st.session_state.df["_unidade"] == "Brasília III"].drop(columns="_unidade") # Seleção apenas dos pacientes salvos em Brasília III
         df_bsb_conv = df_bsb.copy() # Cria uma cópia para identificar quais convênios devem ser exportados
         df_bsb_conv["_convenio"] = df_bsb_conv["Convênio"].apply(identificar_convenio)
@@ -395,11 +394,10 @@ def finalizar():
             estilizar_header(worksheet)
             estilizar_status(worksheet)
 
-        """
-        =============================
-        || Aba 'Itaim' na planilha ||
-        =============================
-        """
+        #=============================
+        #|| Aba 'Itaim' na planilha ||
+        #=============================
+        
         df_itaim = st.session_state.df[st.session_state.df["_unidade"] == "Itaim"].drop(columns = "_unidade").copy() # Seleção apenas dos pacientes salvos em Itaim
 
         if not df_itaim.empty:
@@ -438,18 +436,16 @@ def exportar():
     st.session_state.msg = "📄 Gerando arquivos de elegibilidade..."
     st.session_state.arquivos_txt = {} # Reinicia o dicionário que armazenará os conteúdos dos arquivos .txt
 
-    """
-    Cria uma cópia do DF principal para evitar alterações
-    acidentais nos dados exibidos na aplicação
-    """
+    # Cria uma cópia do DF principal para evitar alterações
+    # acidentais nos dados exibidos na aplicação
+
     df = st.session_state.df.copy()
     df["_sheet"] = df["Convênio"].apply(identificar_empresa)
 
-    """
-    ================================
-    || Arquivos de 'BRasília III' ||
-    ================================
-    """
+    #================================
+    #|| Arquivos de 'Brasília III' ||
+    #================================
+    
     df_bsb = df[df["_unidade"] == "Brasília III"].drop(columns="_sheet").copy() # Seleção apenas dos pacientes salvos em Brasília
 
     # Mantém apenas os convênios válidos para a geração do arquivo
@@ -460,11 +456,10 @@ def exportar():
     if not df_bsb.empty:
         st.session_state.arquivos_txt["Brasilia_III.txt"] = gerar_txt_brasilia(df_bsb)
 
-    """
-    ===================================
-    || Arquivos das empresas (Itaim) ||
-    ===================================
-    """
+    #===================================
+    #|| Arquivos das empresas (Itaim) ||
+    #===================================
+    
     df_itaim = df[df["_unidade"] == "Itaim"].copy() # Seleção apenas dos pacientes salvos em Itaim
 
     # Para cada empresa encontrada, gera um .txt específico
@@ -472,11 +467,10 @@ def exportar():
         df_empresa = df_itaim[df_itaim["_sheet"] == empresa].drop(columns="_sheet").copy()
         st.session_state.arquivos_txt[f"{empresa}.txt"] = gerar_txt_empresa(df_empresa, empresa)
 
-    """
-    ====================================
-    || Arquivos dos convênios (Itaim) ||
-    ====================================
-    """
+    #====================================
+    #|| Arquivos dos convênios (Itaim) ||
+    #====================================
+    
     df_conv_itaim = df_itaim[df_itaim["_sheet"].isna()].drop(columns="_sheet").copy() # Seleção dos registros diferentes das empresas
     df_conv_itaim["_convenio_nome"] = df_conv_itaim["Convênio"].apply(identificar_convenio) # Mantém apenas os convênios válidos
     df_conv_itaim = df_conv_itaim[df_conv_itaim["_convenio_nome"].notna()]
@@ -485,11 +479,10 @@ def exportar():
     if not df_conv_itaim.empty:
         st.session_state.arquivos_txt["Convenios_Itaim.txt"] = gerar_txt_convenios(df_conv_itaim)
 
-    """
-    ==============================
-    || Compactação dos arquivos ||
-    ==============================
-    """
+    #==============================
+    #|| Compactação dos arquivos ||
+    #==============================
+    
     zip_buffer = BytesIO() # Cria um ZIP em memória com todos os .txt gerados
     
     with ZipFile(zip_buffer, "w") as zip_file:

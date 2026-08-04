@@ -77,7 +77,7 @@ preto = Font(
 
 # Forte para CANCELADO, NÃO ELEGÍVEL E REAGENDADO
 branco = Font(
-    color = "FFFFFF"
+    color = "FFFFFF",
     bold = True
 )
 
@@ -103,29 +103,24 @@ IDX_SECOES = 4
 
 def parse_checkup(texto: str) -> pd.DataFrame:
 
-    """
-    ===========================
-    || Normalização do texto ||
-    ===========================
-    """
-    
+    #===========================
+    #|| Normalização do texto ||
+    #===========================
+        
     # Remove caracteres invisíveis que podem aparecer ao copiar
     texto = re.sub(r'[\u200b\u200c\u200d\u202a\u202b\u202c\u202d\u202e\ufeff]', '', texto)
     texto = texto.replace('\r\n', '\n').replace('\r', '\n')
     
     todas_linhas = [l.strip() for l in texto.split('\n')] # Divide o texto em linhas e remove espaços extras
 
-    """
-    ==============================
-    || Identificação dos blocos ||
-    ==============================
-    """
+    #==============================
+    #|| Identificação dos blocos ||
+    #==============================
+       
+    # Cada paciente inivia em uma linha contendo um horário válido.
+    # A segunda condição evita que números pertencentes a outras
+    # seções sejam interpretados como um novo paciente
     
-    """
-    Cada paciente inivia em uma linha contendo um horário válido.
-    A segunda condição evita que números pertencentes a outras
-    seções sejam interpretados como um novo paciente
-    """
     inicios = [
         i for i, linha in enumerate(todas_linhas)
         if hora_regex.match(linha)

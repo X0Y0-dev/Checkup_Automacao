@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import re
+import unicodedata
+
 from io import BytesIO
 from datetime import date, timedelta
 from openpyxl.styles import PatternFill, Font
@@ -146,11 +148,18 @@ def parse_checkup(texto: str) -> pd.DataFrame:
         })
     return pd.DataFrame(pacientes) # Retorna todos os pacientes encontrador em formato DataFrame
 
+def normalizar(texto: str) -> str:
+    texto = unicodedata.normalize("NFD", texto)        # Decompõe acentos
+    texto = texto.encode("ascii", "ignore").decode()   # Remove acentos
+    texto = texto.lower()                              # Deixa em minúsculo
+    texto = re.sub(r'\s+', ' ', texto).strip()         # Remove espaços extras
+    return texto
+
 def identificar_empresa(convenio: str) -> str | None:
 
     # Comparação com o que é passado com o dicionário
     for empresa in EMPRESAS:
-        if empresa.lower() in convenio.lower():
+        if normalizar(empresa) in normalizar(convenio):
             return empresa
     return None
 
@@ -158,7 +167,7 @@ def identificar_convenio(convenio: str) -> str | None:
 
     # Comparação com o que é passado com o dicionário
     for convs in CONVENIOS:
-        if convs.lower() in convenio.lower():
+        if normalizar(convs) in normalizar(convenio):
             return convs
     return None
 

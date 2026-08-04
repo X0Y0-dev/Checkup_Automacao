@@ -11,10 +11,10 @@ from openpyxl.formatting.rule import FormulaRule
 #region CONFIRGUAÇÃO DE ELEBILIDADE
 
 # Empresas que necessitam de elegibilidade
-EMPRESAS = ["Bradesco", "Santander", "Itaú", "Mediservice"]
+EMPRESAS = ["Bradesco", "Santander", "Itau", "Mediservice"]
 
 # Convênios que necessitam de elegibilidade
-CONVENIOS = ["Central Nacional Unimed", "Unimed Seguros Saúde", "Care Plus", "Unafisco", "Câmara", "Gama", "Senado", "Intermedici"]
+CONVENIOS = ["Central Nacional Unimed", "Unimed Seguros Saude", "Care Plus", "Unafisco", "Camara", "Gama", "Senado", "Intermedici"]
 
 # Opções de status
 STATUS_OPC = ["ELEGÍVEL", "PENDENTE", "NÃO ELEGÍVEL", "CANCELADO", "REAGENDADO"]

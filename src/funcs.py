@@ -268,42 +268,34 @@ def estilizar_header(worksheet):
 
 def estilizar_status(worksheet):
     dv = DataValidation(
-        type="list",
-        formula1=f'"{",".join(STATUS_OPC)}"',
-        allow_blank=True
+        type = "list",
+        formula1 = f'"{",".join(STATUS_OPC)}"',
+        allow_blank = True
     )
 
     worksheet.add_data_validation(dv)
 
-    # Descobre a letra da coluna Status e o total de colunas
     coluna_status = None
-    ultima_coluna = None
-
     for cell in worksheet[1]:
         if cell.value == "Status":
             coluna_status = cell.column_letter
-        if cell.value is not None:
-            ultima_coluna = cell.column_letter  # Avança até a última coluna com header
-
+            break
+    
     if not coluna_status:
         return
+    
+    # Intervalo de validação
+    intervalo = f"{coluna_status}2:{coluna_status}{worksheet.max_row}"
 
-    ultima_linha = worksheet.max_row
-
-    # Intervalo da coluna Status (para a DataValidation)
-    intervalo_status = f"{coluna_status}2:{coluna_status}{ultima_linha}"
-    dv.add(intervalo_status)
-
-    # Intervalo da linha inteira (para o conditional formatting)
-    intervalo_linha = f"A2:{ultima_coluna}{ultima_linha}"
+    dv.add(intervalo)
 
     for status, (fill, font) in STATUS_ESTILOS.items():
         worksheet.conditional_formatting.add(
-            intervalo_linha,
+            intervalo,
             FormulaRule(
-                formula=[f'${coluna_status}2="{status}"'],  # $ fixa a coluna
-                fill=fill,
-                font=font
+                formula = [f'{coluna_status}2="{status}"'],
+                fill = fill,
+                font = font
             )
         )
             

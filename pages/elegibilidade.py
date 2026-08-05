@@ -402,11 +402,11 @@ def finalizar():
 
         if not df_itaim.empty:
 
-            """
-            Identifica se cada paciente pertence a uma empresa específica.
-            Quando não pertence, o valor permanece nulo e será tratado
-            posteriormente como um convênio comum.
-            """
+            
+            #Identifica se cada paciente pertence a uma empresa específica.
+            #Quando não pertence, o valor permanece nulo e será tratado
+            #posteriormente como um convênio comum.
+            
             df_itaim["_sheet"] = df_itaim["Convênio"].apply(identificar_empresa)
 
             # Registros sem empresa específica são destinados à aba "Convênios"

@@ -12,7 +12,7 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.formatting.rule import FormulaRule
 
 from src.menu import render_header, render_sidebar
-from src.funcs import parse_checkup, identificar_empresa, identificar_convenio, gerar_txt_empresa, gerar_txt_convenios, gerar_txt_brasilia, estilizar_header, estilizar_status, EMPRESAS
+from src.funcs import parse_checkup, identificar_empresa, identificar_convenio, gerar_txt_empresa, gerar_txt_convenios, gerar_txt_brasilia, estilizar_header, estilizar_validacoes, EMPRESAS
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -365,7 +365,7 @@ def rollback():
 def finalizar():
     st.session_state.msg = f"📋 Total final: {len(st.session_state.df)} paciente(s)" # Exibição do total de pacinetes tratados
 
-    colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status"] # Define quais colunas serão passadas para a planilha
+    colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status", "Situação"] # Define quais colunas serão passadas para a planilha
     st.session_state.df = st.session_state.df[colunas + ["_unidade"]] # Adiciona a coluna de 'Unidade' à planilha
 
     # Adicionando filtro por Data e Hora na planilha, removendo apenas aqueles agendados às 10h
@@ -392,7 +392,7 @@ def finalizar():
             df_bsb_conv.to_excel(writer, sheet_name = "Brasília III", index = False)
             worksheet = writer.sheets["Brasília III"]
             estilizar_header(worksheet)
-            estilizar_status(worksheet)
+            estilizar_validacoes(worksheet)
 
         #=============================
         #|| Aba 'Itaim' na planilha ||
@@ -420,14 +420,14 @@ def finalizar():
             df_convenios.drop(columns = "_convenio").to_excel(writer, sheet_name = "Convênios", index = False)
             worksheet = writer.sheets["Convênios"]
             estilizar_header(worksheet)
-            estilizar_status(worksheet)
+            estilizar_validacoes(worksheet)
 
             # Cria automaticamente uma aba para cada empresa encontrada
             for empresa in df_itaim["_sheet"].dropna().unique():
                 df_itaim[df_itaim["_sheet"] == empresa].drop(columns = "_sheet").to_excel(writer, sheet_name = empresa, index = False)
                 worksheet = writer.sheets[empresa]
                 estilizar_header(worksheet)
-                estilizar_status(worksheet)
+                estilizar_validacoes(worksheet)
 
     st.session_state.excel_bytes = output.getvalue()
     st.session_state.btn_exportar = False

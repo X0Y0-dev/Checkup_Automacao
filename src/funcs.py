@@ -19,76 +19,63 @@ EMPRESAS = ["Bradesco", "Santander", "Itau", "Mediservice"]
 CONVENIOS = ["Central Nacional Unimed", "Unimed Seguros Saude", "Care Plus", "Unafisco", "Camara", "Gama", "Senado", "Intermedici"]
 
 # Opções de status
-STATUS_OPC = ["ELEGÍVEL", "PENDENTE", "NÃO ELEGÍVEL", "CANCELADO", "REAGENDADO"]
+STATUS_OPC = ["-", "ELEGÍVEL", "NÃO ELEGÍVEL", "SEM GUIA"]
+
+# Opções de situação
+SITUACAO_OPC = ["-", "AGENDADO", "REAGENDADO", "CANCELADO", "PENDENTE", "VENCIDA"]
 
 #endregion
 
 #region CONFIGURAÇÕES DE ESTILIZAÇÃO
 
-# Cabeçalho estilizado na planilha
-CINZA_HEADER = PatternFill(
-    start_color = "D9D9D9",
-    end_color = "D9D9D9",
-    fill_type = "solid"
-)
+# Função de definir a cor da célula
+def fill(cor: str) -> PatternFill:
+    return PatternFill(
+        start_color = cor,
+        end_color = cor,
+        fill_type = "solid"
+    )
 
-# Fonte estilizada do cabeçalho
-FONTE_HEADER = Font(bold = True)
+# Função de definir cor da fonte
+def fonte(cor: str = "000000", bold: bool = True) -> Font:
+    return Font(
+        color = cor,
+        bold = True
+    )
 
-# Cor para status ELEGIVEL
-verde = PatternFill(
-    start_color = "92D050",
-    end_color = "92D050",
-    fill_type = "solid"
-)
 
-# Cor para status PENDENTE
-amarelo = PatternFill(
-    start_color = "FFFF00",
-    end_color = "FFFF00",
-    fill_type = "solid"
-)
+# Cores das células
+VERDE = fill("92D050")
+VERDE_ESCURO = fill("006400")
+AMARELO = fill("FFFF00")
+VERMELHO = fill("FF0000")
+VINHO = fill("430000")
+SCARLET = fill("CC0000")
+LARANJA = fill("FF5F15")
+ROXO = fill("7030A0")
+BRANCO_FILL = fill("FFFFFF")
+CINZA = fill("D9D9D9")
 
-# Cor para status CANCELADO e NÃO ELEGÍVEL
-vermelho = PatternFill(
-    start_color = "FF0000",
-    end_color = "FF0000",
-    fill_type = "solid"
-)
-
-# Cor para status REAGENDADO
-roxo = PatternFill(
-    start_color = "7030A0",
-    end_color = "7030A0",
-    fill_type = "solid"
-)
-
-branco_fill = PatternFill(
-    start_color = "FFFFFF",
-    end_color = "FFFFFF",
-    fill_type = "solid"
-)
-
-# Fonte para ELEGÍVEL E PENDENTE
-preto = Font(
-    color = "000000",
-    bold = True
-)
-
-# Forte para CANCELADO, NÃO ELEGÍVEL E REAGENDADO
-branco = Font(
-    color = "FFFFFF",
-    bold = True
-)
+# Cores das fontes
+PRETO = fonte()
+BRANCO = fonte("FFFFFF")
 
 # Dicionário de estilização de status
 STATUS_ESTILOS = {
-    "-": (branco_fill, preto),
-    "ELEGÍVEL": (verde, preto),
-    "PENDENTE": (amarelo, preto),
-    "CANCELADO": (vermelho, branco),
-    "NÃO ELEGÍVEL": (vermelho, branco),
-    "REAGENDADO": (roxo, branco)
+    "-": (BRANCO_FILL, PRETO),
+    "ELEGÍVEL": (VERDE, PRETO),
+    "NÃO ELEGÍVEL": (VERMELHO, BRANCO),
+    "SEM GUIA": (AMARELO, PRETO),
+}
+
+# Dicionário de estilização de situação
+SITUACAO_ESTILOS = {
+    "-": (BRANCO_FILL, PRETO),
+    "AGENDADO": (VERDE_ESCURO, BRANCO),
+    "REAGENDADO": (ROXO, BRANCO),
+    "CANCELADO": (VINHO, BRANCO),
+    "PENDENTE": (LARANJA, BRANCO),
+    "VENCIDA": (SCARLET, BRANCO),
 }
 
 #endregion
@@ -235,8 +222,8 @@ def estilizar_header(worksheet):
     worksheet.freeze_panes = "A2"
 
     for cell in worksheet[1]:
-        cell.fill = CINZA_HEADER
-        cell.font = FONTE_HEADER
+        cell.fill = CINZA
+        cell.font = PRETO
     
     for column in worksheet.columns:
 
@@ -261,37 +248,70 @@ def estilizar_header(worksheet):
         worksheet.column_dimensions[column_letter].width = largura
 
 
-def estilizar_status(worksheet):
-    dv = DataValidation(
+def estilizar_validacoes(worksheet):
+
+    # Validações
+    dv_status = DataValidation(
         type = "list",
         formula1 = f'"{",".join(STATUS_OPC)}"',
         allow_blank = True
     )
 
-    worksheet.add_data_validation(dv)
+    dv_situacao = DataValidation(
+        type = "list",
+        formula1 = f'"{",".join(SITUACAO_OPC)}"',
+        allow_blank = True
+    )
 
-    coluna_status = None
-    for cell in worksheet[1]:
-        if cell.value == "Status":
-            coluna_status = cell.column_letter
-            break
-    
-    if not coluna_status:
-        return
-    
-    # Intervalo de validação
-    intervalo = f"{coluna_status}2:{coluna_status}{worksheet.max_row}"
+    worksheet.add_data_validation(dv_status)
+    worksheet.add_data_validation(dv_situacao)
 
-    dv.add(intervalo)
+    # Localiza as colunas
+    colunas = {
+        cell.value: cell.column_letter
+        for cell in worksheet[1]
+    }
 
-    for status, (fill, font) in STATUS_ESTILOS.items():
-        worksheet.conditional_formatting.add(
-            intervalo,
-            FormulaRule(
-                formula = [f'{coluna_status}2="{status}"'],
-                fill = fill,
-                font = font
+    # ===========================
+    # ||     Coluna Status     ||
+    # ===========================
+
+    if "Status" in colunas:
+
+        coluna = colunas["Status"]
+        intervalo = f"{coluna}2:{coluna}{worksheet.max_row}"
+
+        dv_status.add(intervalo)
+
+        for status, (fill, font) in STATUS_ESTILOS.items():
+            worksheet.conditional_formatting.add(
+                intervalo,
+                FormulaRule(
+                    formula=[f'{coluna}2="{status}"'],
+                    fill=fill,
+                    font=font
+                )
             )
-        )
+
+    # ===========================
+    # ||    Coluna Situação    ||
+    # ===========================
+
+    if "Situação" in colunas:
+
+        coluna = colunas["Situação"]
+        intervalo = f"{coluna}2:{coluna}{worksheet.max_row}"
+
+        dv_situacao.add(intervalo)
+
+        for situacao, (fill, font) in SITUACAO_ESTILOS.items():
+            worksheet.conditional_formatting.add(
+                intervalo,
+                FormulaRule(
+                    formula=[f'{coluna}2="{situacao}"'],
+                    fill=fill,
+                    font=font
+                )
+            )
             
 #endregion

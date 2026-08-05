@@ -140,6 +140,7 @@ def parse_checkup(texto: str) -> pd.DataFrame:
             "Convênio": convenio,
             "Categoria": categoria,
             "Status": "",
+            "Situação": "",
         })
     return pd.DataFrame(pacientes) # Retorna todos os pacientes encontrador em formato DataFrame
 
@@ -242,7 +243,7 @@ def estilizar_header(worksheet):
         largura = max_length + 2
 
         # Ajuste de largura para status
-        if header == "Status":
+        if header == "Status" or header == "Situação":
             largura = 20
         
         worksheet.column_dimensions[column_letter].width = largura

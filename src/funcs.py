@@ -168,15 +168,12 @@ def identificar_convenio(convenio: str) -> str | None:
     return None
 
 def gerar_txt(df: pd.DataFrame, agrupar_por: str | None = None) -> bytes:
-    """
-    Gera o TXT de agenda a partir de um DataFrame.
- 
-    agrupar_por:
-        - None -> comportamento de gerar_txt_brasilia / gerar_txt_empresa
-                  (agrupa só por Data, linha traz Convênio)
-        - "Convênio" -> comportamento de gerar_txt_convenios
-                  (agrupa por Convênio e depois por Data, linha não repete o Convênio)
-    """
+    # Gera o TXT de agenda a partir de um DataFrame.
+    # agrupar_por:
+    #   - None -> comportamento de gerar_txt_brasilia / gerar_txt_empresa
+    #            (agrupa só por Data, linha traz Convênio)
+    #   - "Convênio" -> comportamento de gerar_txt_convenios
+    #              (agrupa por Convênio e depois por Data, linha não repete o Convênio)
     linhas = []
  
     def bloco_por_data(df_bloco: pd.DataFrame, indent: str = ""):

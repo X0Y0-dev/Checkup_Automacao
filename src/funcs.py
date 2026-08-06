@@ -37,7 +37,7 @@ def fill(cor: str) -> PatternFill:
     )
 
 # Função de definir cor da fonte
-def fonte(cor: str = "000000", bold: bool = True) -> Font:
+def fonte(cor: str, bold: bool = True) -> Font:
     return Font(
         color = cor,
         bold = True
@@ -57,7 +57,7 @@ BRANCO_FILL = fill("FFFFFF")
 CINZA = fill("D9D9D9")
 
 # Cores das fontes
-PRETO = fonte()
+PRETO = fonte("000000")
 BRANCO = fonte("FFFFFF")
 
 # Dicionário de estilização de status

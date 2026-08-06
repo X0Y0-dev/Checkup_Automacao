@@ -167,56 +167,39 @@ def identificar_convenio(convenio: str) -> str | None:
             return convs
     return None
 
-def gerar_txt_convenios(df_convenios: pd.DataFrame) -> bytes:
+def gerar_txt(df: pd.DataFrame, agrupar_por: str | None = None) -> bytes:
+    """
+    Gera o TXT de agenda a partir de um DataFrame.
+ 
+    agrupar_por:
+        - None -> comportamento de gerar_txt_brasilia / gerar_txt_empresa
+                  (agrupa só por Data, linha traz Convênio)
+        - "Convênio" -> comportamento de gerar_txt_convenios
+                  (agrupa por Convênio e depois por Data, linha não repete o Convênio)
+    """
     linhas = []
-
-    # Percorre cada convênio em ordem alfabética
-    for convenio in sorted(df_convenios["Convênio"].unique()):
-        linhas.append(f"\n\n{convenio}:") # Adiciona o nome do convênio como título da seção
-        df_conv = df_convenios[df_convenios["Convênio"] == convenio] # Seleciona apenas os pacientes do convênio atual
-
-        # Agrupa os pacientes por data
-        for data in sorted(df_conv["Data"].unique()):
-            linhas.append(f"\n  {data}:\n") # Adiciona a data como subtítulo da seção
-            df_data = df_conv[(df_conv["Data"] == data) & (~df_conv["Hora"].str.startswith("10:"))] # Seleciona apenas os pacientes da data atual
-            
-            # Lista os pacientes e suas respectivas categorias
+ 
+    def bloco_por_data(df_bloco: pd.DataFrame, indent: str = ""):
+        for data in sorted(df_bloco["Data"].unique()):
+            linhas.append(f"{indent}{data}:")
+            df_data = df_bloco[
+                (df_bloco["Data"] == data) & (~df_bloco["Hora"].str.startswith("10:"))
+            ]
             for _, row in df_data.iterrows():
-                linhas.append(f"    {row['Paciente']} - {row['Categoria']}")
-        linhas.append("") # Linha em branco
-
-    return "\n\n".join(linhas).encode("utf-8")  # Retorna bytes ao invés de salvar
-
-def gerar_txt_brasilia(df_brasilia: pd.DataFrame) -> bytes:
-    
-    linhas = []
-
-    # Agrupa os pacientes por data
-    for data in sorted(df_brasilia["Data"].unique()):
-        linhas.append(f"{data}:")
-        df_data = df_brasilia[(df_brasilia["Data"] == data) & (~df_brasilia["Hora"].str.startswith("10:"))] # Seleciona apenas os pacientes da data atual
-        
-        # Lista os pacientes e suas respectivas categorias
-        for _, row in df_data.iterrows():
-            linhas.append(f"    {row['Paciente']} - {row['Convênio']} - {row['Categoria']}")
-        linhas.append("")
-
-    return "\n\n".join(linhas).encode("utf-8")  # Retorna bytes ao invés de salvar
-
-def gerar_txt_empresa(df_empresa: pd.DataFrame, nome_empresa: str) -> bytes:
-    linhas = []
-
-    # Agrupa os pacientes por data
-    for data in sorted(df_empresa["Data"].unique()):
-        linhas.append(f"{data}:")
-        df_data = df_empresa[(df_empresa["Data"] == data) & (~df_empresa["Hora"].str.startswith("10:"))] # Seleciona apenas os pacientes da data atual
-
-        # Lista os pacientes e suas respectivas categorias
-        for _, row in df_data.iterrows():
-            linhas.append(f"    {row['Paciente']} - {row['Convênio']} - {row['Categoria']}")
-        linhas.append("")
-    
-    return "\n\n".join(linhas).encode("utf-8") # Retorna bytes ao invés de salvar
+                if agrupar_por:
+                    linhas.append(f"{indent}    {row['Paciente']} - {row['Categoria']}")
+                else:
+                    linhas.append(f"{indent}    {row['Paciente']} - {row['Convênio']} - {row['Categoria']}")
+            linhas.append("")
+ 
+    if agrupar_por:
+        for grupo in sorted(df[agrupar_por].unique()):
+            linhas.append(f"\n\n{grupo}:")
+            bloco_por_data(df[df[agrupar_por] == grupo], indent="  ")
+    else:
+        bloco_por_data(df)
+ 
+    return "\n\n".join(linhas).encode("utf-8")
 
 def estilizar_header(worksheet):
 

@@ -465,7 +465,7 @@ def exportar():
     # Para cada empresa encontrada, gera um .txt específico
     for empresa in df_itaim["_sheet"].dropna().unique():
         df_empresa = df_itaim[df_itaim["_sheet"] == empresa].drop(columns="_sheet").copy()
-        st.session_state.arquivos_txt[f"{empresa}.txt"] = gerar_txt(df_empresa, empresa)
+        st.session_state.arquivos_txt[f"{empresa}.txt"] = gerar_txt(df_empresa)
 
     #====================================
     #|| Arquivos dos convênios (Itaim) ||

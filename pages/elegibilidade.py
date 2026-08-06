@@ -12,7 +12,7 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.formatting.rule import FormulaRule
 
 from src.menu import render_header, render_sidebar
-from src.funcs import parse_checkup, identificar_empresa, identificar_convenio, gerar_txt_empresa, gerar_txt_convenios, gerar_txt_brasilia, estilizar_header, estilizar_validacoes, EMPRESAS
+from src.funcs import parse_checkup, identificar_empresa, identificar_convenio, gerar_txt, estilizar_header, estilizar_validacoes, EMPRESAS
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -454,7 +454,7 @@ def exportar():
 
     # Gera o arquivo apenas se houver registros
     if not df_bsb.empty:
-        st.session_state.arquivos_txt["Brasilia_III.txt"] = gerar_txt_brasilia(df_bsb)
+        st.session_state.arquivos_txt["Brasilia_III.txt"] = gerar_txt(df_bsb)
 
     #===================================
     #|| Arquivos das empresas (Itaim) ||
@@ -465,7 +465,7 @@ def exportar():
     # Para cada empresa encontrada, gera um .txt específico
     for empresa in df_itaim["_sheet"].dropna().unique():
         df_empresa = df_itaim[df_itaim["_sheet"] == empresa].drop(columns="_sheet").copy()
-        st.session_state.arquivos_txt[f"{empresa}.txt"] = gerar_txt_empresa(df_empresa, empresa)
+        st.session_state.arquivos_txt[f"{empresa}.txt"] = gerar_txt(df_empresa, empresa)
 
     #====================================
     #|| Arquivos dos convênios (Itaim) ||
@@ -477,7 +477,7 @@ def exportar():
 
     # Gera o arquivo de convênios apenas se houver registros
     if not df_conv_itaim.empty:
-        st.session_state.arquivos_txt["Convenios_Itaim.txt"] = gerar_txt_convenios(df_conv_itaim)
+        st.session_state.arquivos_txt["Convenios_Itaim.txt"] = gerar_txt(df_conv_itaim)
 
     #==============================
     #|| Compactação dos arquivos ||

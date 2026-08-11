@@ -71,7 +71,7 @@ STATUS_ESTILOS = {
     "SEM GUIA": (AMARELO, PRETO),
 }
 
-# Dicionário de estilização de situação
+# Dicionário de estilização de situação 
 SITUACAO_ESTILOS = {
     "-": (BRANCO_FILL, PRETO),
     "AGENDADO": (VERDE_ESCURO, BRANCO),

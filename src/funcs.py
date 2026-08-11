@@ -22,7 +22,7 @@ CONVENIOS = ["Central Nacional Unimed", "Unimed Seguros Saude", "Care Plus", "Un
 STATUS_OPC = ["-", "ELEGÍVEL", "NÃO ELEGÍVEL", "SEM GUIA"]
 
 # Opções de situação
-SITUACAO_OPC = ["-", "AGENDADO", "REAGENDADO", "CANCELADO", "PENDENTE", "VENCIDA", "TEMPO NÃO HÁBIL"]
+SITUACAO_OPC = ["-", "AGENDADO", "REAGENDADO", "CANCELADO", "PENDENTE", "VENCIDA", "TEMPO NÃO HÁBIL", "INELEGÍVEL", "DEMITIDO"]
 
 #endregion
 
@@ -50,6 +50,8 @@ VERDE_ESCURO = fill("006400")
 AMARELO = fill("FFFF00")
 VERMELHO = fill("FF0000")
 VINHO = fill("8B0000")
+VERMELHO_ESCURO = fill("C00000")
+TERRACOTA: fill("E26B6B")
 LARANJA = fill("FF5F15")
 EBONY = fill("0C0B1D")
 ROXO = fill("7030A0")
@@ -78,6 +80,8 @@ SITUACAO_ESTILOS = {
     "PENDENTE": (LARANJA, BRANCO),
     "VENCIDA": (VINHO, BRANCO),
     "TEMPO NÃO HÁBIL": (EBONY, BRANCO),
+    "DEMITIDO": (VERMELHO_ESCURO, BRANCO),
+    "INELEGÍVEL": (TERRACOTA, PRETO),
 }
 
 #endregion

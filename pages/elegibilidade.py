@@ -343,7 +343,7 @@ def rollback():
         st.session_state.msg = "⚠️ Nada para desfazer!"
         return
 
-    # Apaga a última ação coluna ao dar rollback
+    # Recupera o último estado salvo no histórico
     st.session_state.df = st.session_state.historico.pop()
 
     if st.session_state.df.empty:
@@ -355,11 +355,20 @@ def rollback():
 
     # Exibição do estado em que os dados se encontram
     total = len(st.session_state.df)
+
+    # Verifica se a coluna _unidade existe antes de utilizá-la
+    if "_unidade" in st.session_state.df.columns:
+        itaim = (st.session_state.df["_unidade"] == "Itaim").sum()
+        brasilia = (st.session_state.df["_unidade"] == "Brasília III").sum()
+    else:
+        itaim = 0
+        brasilia = 0
+
     st.session_state.msg = (
-        f"↩️ Último lote desfeito ── total acumulado: {total}"
+        f"↩️ Último lote desfeito ── total acumulado: {total}\n\n"
         f"📍 Pacientes por unidade:\n\n"
-        f"Itaim: {(st.session_state.df['_unidade'] == 'Itaim').sum()}\n\n"
-        f"Brasília III: {(st.session_state.df['_unidade'] == 'Brasília III').sum()}"
+        f"Itaim: {itaim}\n\n"
+        f"Brasília III: {brasilia}"
     )
 
 def finalizar():

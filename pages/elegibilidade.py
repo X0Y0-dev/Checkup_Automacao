@@ -369,7 +369,17 @@ def finalizar():
     st.session_state.df = st.session_state.df[colunas + ["_unidade"]] # Adiciona a coluna de 'Unidade' à planilha
 
     # Adicionando filtro por Data e Hora na planilha, permitindo apenas os horários das 7h e 9h
-    st.session_state.df = (st.session_state.df[st.session_state.df["Hora"].str.startswith(("07:", "09:"))].sort_values(by=["Data", "Hora"]).reset_index(drop=True))
+    st.write("ANTES DO FILTRO:", st.session_state.df.columns.tolist())
+
+    st.session_state.df = (
+        st.session_state.df[
+            st.session_state.df["Hora"].str.startswith(("07:", "09:"))
+        ]
+        .sort_values(by=["Data", "Hora"])
+        .reset_index(drop=True)
+    )
+    
+    st.write("DEPOIS DO FILTRO:", st.session_state.df.columns.tolist())
 
     output = BytesIO()
 

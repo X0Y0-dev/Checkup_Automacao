@@ -368,8 +368,8 @@ def finalizar():
     colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status", "Situação"] # Define quais colunas serão passadas para a planilha
     st.session_state.df = st.session_state.df[colunas + ["_unidade"]] # Adiciona a coluna de 'Unidade' à planilha
 
-    # Adicionando filtro por Data e Hora na planilha, removendo apenas aqueles agendados às 10h
-    st.session_state.df = st.session_state.df[~st.session_state.df["Hora"].str.startswith("10:")].sort_values(by = ["Data", "Hora"]).reset_index(drop=True)
+    # Adicionando filtro por Data e Hora na planilha, permitindo apenas os horários das 7h e 9h
+    st.session_state.df = (st.session_state.df[st.session_state.df["Hora"].str.startswith(("07:", "09:"))].sort_values(by=["Data", "Hora"]).reset_index(drop=True))
 
     output = BytesIO()
 

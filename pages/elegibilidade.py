@@ -289,6 +289,10 @@ def adicionar():
     if dia_semana == "Domingo":
         st.session_state.msg = "🚨 ATENÇÃO 🚨 Check-up não é realizado aos domingos!"
         return
+        
+    if st.session_state.spinner_unidade == "Brasília III" and dia_semana != "Terça-feira":
+        st.session_state.msg = "🚨 ATENÇÃO 🚨 Check-up em Brasília é realizado apenas às Terças-Feiras!"
+        return
 
     # Tratativa de erro caso o texto passado não seja conforma a formatação esperada
     novo_df = parse_checkup(texto)

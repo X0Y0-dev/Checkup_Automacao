@@ -16,7 +16,7 @@ from openpyxl.formatting.rule import FormulaRule
 EMPRESAS = ["Bradesco", "Santander", "Itau", "Mediservice"]
 
 # Convênios que necessitam de elegibilidade
-CONVENIOS = ["Central Nacional Unimed", "Unimed Seguros Saude", "Care Plus", "Unafisco", "Camara", "Gama", "Senado", "Intermedici"]
+CONVENIOS = ["Central Nacional Unimed", "Unimed Seguros Saude", "Care Plus", "Unafisco", "Camara", "Gama", "Senado"]
 
 # Opções de status
 STATUS_OPC = ["-", "ELEGÍVEL", "NÃO ELEGÍVEL", "SEM GUIA"]

@@ -289,7 +289,26 @@ def adicionar():
     if dia_semana == "Domingo":
         st.session_state.msg = "🚨 ATENÇÃO 🚨 Check-up não é realizado aos domingos!"
         return
-        
+
+    # TRATATIVA DE EXCEÇÃO ENQUANTO ERRO NÃO É CORRIGIDO
+    @st.dialog("Confirmação de Exceção")
+    def confirmar_excecao():
+        st.write("Agendamento em Brasília III na quinta-feira é uma exceção?")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Sim, prosseguir"):
+                st.session_state.confirmou_excecao = True
+                st.rerun()      
+        with col2:
+            if st.button("Não"):
+                st.session_state.msg = "🚨 Check-up em Brasília III não realizado por não ser uma exceção."
+                st.session_state.abrir_dialog = False
+                st.rerun()
+    if st.session_state.spinner_unidade == "Brasília III" and dia_semana == "Quinta-feira":
+        if not st.session_state.get("confirmou_excecao", False):
+            confirmar_excecao()
+            return
+    
     if st.session_state.spinner_unidade == "Brasília III" and dia_semana != "Terça-feira":
         st.session_state.msg = "🚨 ATENÇÃO 🚨 Check-up em Brasília é realizado apenas às Terças-Feiras!"
         return

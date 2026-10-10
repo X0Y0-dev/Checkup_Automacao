@@ -19,10 +19,10 @@ EMPRESAS = ["Bradesco", "Santander", "Itau", "Mediservice"]
 CONVENIOS = ["Central Nacional Unimed", "Unimed Seguros Saude", "Care Plus", "Unafisco", "Camara", "Gama", "Senado"]
 
 # Opções de status
-STATUS_OPC = ["-", "ELEGÍVEL", "NÃO ELEGÍVEL", "SEM GUIA"]
+STATUS_OPC = ["ELEGÍVEL", "NÃO ELEGÍVEL", "SEM GUIA"]
 
 # Opções de situação
-SITUACAO_OPC = ["-", "AGENDADO", "REAGENDADO", "CANCELADO", "PENDENTE", "VENCIDA", "TEMPO NÃO HÁBIL", "SEM COBERTURA", "DEMITIDO"]
+SITUACAO_OPC = ["AGENDADO", "REAGENDADO", "CANCELADO", "PENDENTE", "VENCIDA", "TEMPO NÃO HÁBIL", "SEM COBERTURA", "DEMITIDO"]
 
 #endregion
 
@@ -55,7 +55,6 @@ TERRACOTA = fill("E26B6B")
 LARANJA = fill("FF5F15")
 EBONY = fill("0C0B1D")
 ROXO = fill("7030A0")
-BRANCO_FILL = fill("FFFFFF")
 CINZA = fill("D9D9D9")
 CINZA_ESCURO = fill("5A5A5A")
 
@@ -65,7 +64,6 @@ BRANCO = fonte("FFFFFF")
 
 # Dicionário de estilização de status
 STATUS_ESTILOS = {
-    "-": (BRANCO_FILL, PRETO),
     "ELEGÍVEL": (VERDE, PRETO),
     "NÃO ELEGÍVEL": (VERMELHO, BRANCO),
     "SEM GUIA": (AMARELO, PRETO),
@@ -73,7 +71,6 @@ STATUS_ESTILOS = {
 
 # Dicionário de estilização de situação 
 SITUACAO_ESTILOS = {
-    "-": (BRANCO_FILL, PRETO),
     "AGENDADO": (VERDE_ESCURO, BRANCO),
     "REAGENDADO": (ROXO, BRANCO),
     "CANCELADO": (CINZA_ESCURO, BRANCO),

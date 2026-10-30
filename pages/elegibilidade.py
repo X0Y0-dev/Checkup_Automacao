@@ -247,6 +247,8 @@ if "excel_bytes" not in st.session_state:
     st.session_state.excel_bytes = b""
 if "zip_scripts" not in st.session_state:
     st.session_state.zip_scripts = b""
+if "nome_excel" not in st.session_state:
+    st.session_state.nome_excel = "Elegibilidade.xlsx"
 
 # Importando o CSS na página
 def carregar_css(css_path):
@@ -393,6 +395,23 @@ def finalizar():
     )
     
     st.write("DEPOIS DO FILTRO:", st.session_state.df.columns.tolist())
+
+    if not st.session_state.df.empty:
+        # A coluna "Data" está no formato "DD/MM (Dia-da-semana)"
+        # Extraímos apenas o trecho "DD/MM" usando expressão regular ou split
+        datas = st.session_state.df["Data"].str.extract(r'(\d{2}/\d{2})')[0]
+        
+        primeira_data = datas.iloc[0]
+        ultima_data = datas.iloc[-1]
+
+        if primeira_data == ultima_data:
+            st.session_state.nome_excel = f"Elegibilidade - {primeira_data.replace('/', '-')}.xlsx"
+        else:
+            p_data_fmt = primeira_data.replace('/', '-')
+            u_data_fmt = ultima_data.replace('/', '-')
+            st.session_state.nome_excel = f"Elegibilidade - {p_data_fmt} à {u_data_fmt}.xlsx"
+    else:
+        st.session_state.nome_excel = "Elegibilidade.xlsx"
 
     output = BytesIO()
 

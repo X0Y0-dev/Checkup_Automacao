@@ -302,7 +302,8 @@ def adicionar():
         st.session_state.msg = "⚠️ Nenhum paciente válido foi encontrado no texto informado."
         return
 
-    novo_df["Data"] = f"{dia_mes} ({dia_semana})" # Salvando data na variável para exibir no output
+    novo_df["Data"] = f"{dia_mes} ({dia_semana})" # Mantém a exibição bonita na tabela
+    novo_df["_data_obj"] = data_selecionada        # Salva o objeto date real para ordenar e extrair o intervalo com precisão
     novo_df["_unidade"] = st.session_state.spinner_unidade
 
     # Define quais colunas identificam unicamente um paciente
@@ -397,19 +398,16 @@ def finalizar():
     st.write("DEPOIS DO FILTRO:", st.session_state.df.columns.tolist())
 
     if not st.session_state.df.empty:
-        # A coluna "Data" está no formato "DD/MM (Dia-da-semana)"
-        # Extraímos apenas o trecho "DD/MM" usando expressão regular ou split
-        datas = st.session_state.df["Data"].str.extract(r'(\d{2}/\d{2})')[0]
-        
-        primeira_data = datas.iloc[0]
-        ultima_data = datas.iloc[-1]
+        primeira_data = st.session_state.df["_data_obj"].min()
+        ultima_data = st.session_state.df["_data_obj"].max()
 
-        if primeira_data == ultima_data:
-            st.session_state.nome_excel = f"Elegibilidade - {primeira_data.replace('/', '-')}.xlsx"
+        p_str = primeira_data.strftime("%d-%m")
+        u_str = ultima_data.strftime("%d-%m")
+
+        if p_str == u_str:
+            st.session_state.nome_excel = f"Elegibilidade - {p_str}.xlsx"
         else:
-            p_data_fmt = primeira_data.replace('/', '-')
-            u_data_fmt = ultima_data.replace('/', '-')
-            st.session_state.nome_excel = f"Elegibilidade - {p_data_fmt} à {u_data_fmt}.xlsx"
+            st.session_state.nome_excel = f"Elegibilidade - {p_str} à {u_str}.xlsx"
     else:
         st.session_state.nome_excel = "Elegibilidade.xlsx"
 

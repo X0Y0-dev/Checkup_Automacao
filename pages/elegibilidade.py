@@ -382,27 +382,42 @@ def finalizar():
     st.session_state.msg = f"📋 Total final: {len(st.session_state.df)} paciente(s)" # Exibição do total de pacinetes tratados
 
     colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status", "Situação"] # Define quais colunas serão passadas para a planilha
-    st.session_state.df = st.session_state.df[colunas + ["_unidade"]] # Adiciona a coluna de 'Unidade' à planilha
+    
+    # -------------------------------------------------------------
+    # SEGURANÇA: Garante que _data_obj existe no DataFrame
+    # -------------------------------------------------------------
+    if "_data_obj" not in st.session_state.df.columns:
+        # Se por acaso vier de um estado antigo sem a coluna, 
+        # preenche temporariamente com a data atual selecionada
+        st.session_state.df["_data_obj"] = st.session_state.campo_data
+    # -------------------------------------------------------------
 
-    # Adicionando filtro por Data e Hora na planilha, permitindo apenas os horários das 7h e 9h
-    st.write("ANTES DO FILTRO:", st.session_state.df.columns.tolist())
+    st.session_state.df = st.session_state.df[colunas + ["_unidade", "_data_obj"]]
 
+    # Filtro de horários e ordenação cronológica correta usando o _data_obj
     st.session_state.df = (
         st.session_state.df[
             st.session_state.df["Hora"].str.startswith(("07:", "09:"))
         ]
-        .sort_values(by=["Data", "Hora"])
+        .sort_values(by=["_data_obj", "Hora"])
         .reset_index(drop=True)
     )
-    
-    st.write("DEPOIS DO FILTRO:", st.session_state.df.columns.tolist())
 
+    # -------------------------------------------------------------
+    # NOME DINÂMICO USANDO OS OBJETOS DE DATA REAIS
+    # -------------------------------------------------------------
     if not st.session_state.df.empty:
         primeira_data = st.session_state.df["_data_obj"].min()
         ultima_data = st.session_state.df["_data_obj"].max()
 
-        p_str = primeira_data.strftime("%d-%m")
-        u_str = ultima_data.strftime("%d-%m")
+        # Garante que min() e max() retornem objetos de data válidos
+        if hasattr(primeira_data, "strftime"):
+            p_str = primeira_data.strftime("%d-%m")
+            u_str = ultima_data.strftime("%d-%m")
+        else:
+            # Fallback caso seja string por algum motivo legado
+            p_str = str(primeira_data)[:5].replace("/", "-")
+            u_str = str(ultima_data)[:5].replace("/", "-")
 
         if p_str == u_str:
             st.session_state.nome_excel = f"Elegibilidade - {p_str}.xlsx"
@@ -410,6 +425,7 @@ def finalizar():
             st.session_state.nome_excel = f"Elegibilidade - {p_str} à {u_str}.xlsx"
     else:
         st.session_state.nome_excel = "Elegibilidade.xlsx"
+    # -------------------------------------------------------------
 
     output = BytesIO()
 

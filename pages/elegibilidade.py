@@ -414,10 +414,11 @@ def finalizar():
         if hasattr(primeira_data, "strftime"):
             p_str = primeira_data.strftime("%d-%m")
             u_str = ultima_data.strftime("%d-%m")
+            BARRA = "∕"
         else:
             # Fallback caso seja string por algum motivo legado
-            p_str = str(primeira_data)[:5].replace("/", "-")
-            u_str = str(ultima_data)[:5].replace("/", "-")
+            p_str = str(primeira_data)[:5].replace("-", BARRA)
+            u_str = str(ultima_data)[:5].replace("-", BARRA)
 
         if p_str == u_str:
             st.session_state.nome_excel = f"Elegibilidade - {p_str}.xlsx"
@@ -643,7 +644,7 @@ if st.session_state.excel_bytes:
     st.download_button(
         "⬇️ Baixar Planilha",
         data=st.session_state.excel_bytes,
-        file_name="Elegibilidade.xlsx",
+        file_name=st.session_state.nome_excel,
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         use_container_width=True,
     )

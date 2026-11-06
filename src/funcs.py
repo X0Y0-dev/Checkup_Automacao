@@ -136,6 +136,9 @@ def parse_checkup(texto: str) -> pd.DataFrame:
         # Os quatro ptimeiros campos possuem posição fixa dentro de um bloco válido
         hora, paciente, convenio, categoria = linhas[:4]
 
+        if deve_ignorar(convenio,categoria):
+            continue
+
         # Armazena os dados do paciente
         pacientes.append({
             "Hora": hora,
@@ -153,6 +156,16 @@ def normalizar(texto: str) -> str:
     texto = texto.lower()                              # Deixa em minúsculo
     texto = re.sub(r'\s+', ' ', texto).strip()         # Remove espaços extras
     return texto
+
+def deve_ignorar(convenio: str, categoria: str) -> bool:
+    conv = normalizar(convenio)
+    cat = normalizar(categoria)
+
+    if "santander" in conv and cat in ("getnet", "sx"):
+        return True
+    if "itau" in conv and cat == "itausa":
+        return True
+    return False
 
 def identificar_empresa(convenio: str) -> str | None:
 

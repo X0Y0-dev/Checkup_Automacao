@@ -392,8 +392,6 @@ def finalizar():
         st.session_state.df["_data_obj"] = st.session_state.campo_data
     # -------------------------------------------------------------
 
-    st.session_state.df = st.session_state.df[colunas + ["_unidade", "_data_obj"]]
-
     # Filtro de horários e ordenação cronológica correta usando o _data_obj
     st.session_state.df = (
         st.session_state.df[

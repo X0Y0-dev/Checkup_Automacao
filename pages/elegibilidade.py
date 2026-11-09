@@ -382,7 +382,18 @@ def finalizar():
     st.session_state.msg = f"📋 Total final: {len(st.session_state.df)} paciente(s)" # Exibição do total de pacinetes tratados
 
     colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status", "Situação"] # Define quais colunas serão passadas para a planilha
+        
+    # -------------------------------------------------------------
+    # SEGURANÇA: Garante que _data_obj existe no DataFrame
+    # -------------------------------------------------------------
+    if "_data_obj" not in st.session_state.df.columns:
+        # Se por acaso vier de um estado antigo sem a coluna, 
+        # preenche temporariamente com a data atual selecionada
+        st.session_state.df["_data_obj"] = st.session_state.campo_data
+    # -------------------------------------------------------------
 
+    st.session_state.df = st.session_state.df[colunas + ["_unidade", "_data_obj"]]
+    
     # Filtro de horários e ordenação cronológica correta usando o _data_obj
     st.session_state.df = (
         st.session_state.df[

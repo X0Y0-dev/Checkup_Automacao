@@ -308,7 +308,7 @@ def adicionar():
 
     # Define quais colunas identificam unicamente um paciente
     chave = ["Paciente", "Convênio"]
-    novo_df = novo_df.drop_duplicates(subset = chave, keep = "first") # Remoção de duplicatas, mantendo a primeira adicionada
+    novo_df = novo_df._duplicates(subset = chave, keep = "first") # Remoção de duplicatas, mantendo a primeira adicionada
 
     # Só verifica duplicatas caso já existam registros salvos
     if not st.session_state.df.empty:
@@ -379,22 +379,15 @@ def rollback():
     )
 
 def finalizar():
-    st.session_state.msg = f"📋 Total final: {len(st.session_state.df)} paciente(s)" # Exibição do total de pacinetes tratados
+    st.session_state.msg = f"📋 Total final: {len(st.session_state.df)} paciente(s)"
 
-    colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status", "Situação"] # Define quais colunas serão passadas para a planilha
+    colunas = ["Data", "Hora", "Paciente", "Convênio", "Categoria", "Status", "Situação"]
         
-    # -------------------------------------------------------------
-    # SEGURANÇA: Garante que _data_obj existe no DataFrame
-    # -------------------------------------------------------------
     if "_data_obj" not in st.session_state.df.columns:
-        # Se por acaso vier de um estado antigo sem a coluna, 
-        # preenche temporariamente com a data atual selecionada
         st.session_state.df["_data_obj"] = st.session_state.campo_data
-    # -------------------------------------------------------------
 
     st.session_state.df = st.session_state.df[colunas + ["_unidade", "_data_obj"]]
     
-    # Filtro de horários e ordenação cronológica correta usando o _data_obj
     st.session_state.df = (
         st.session_state.df[
             st.session_state.df["Hora"].str.startswith(("07:", "09:"))
@@ -403,20 +396,15 @@ def finalizar():
         .reset_index(drop=True)
     )
 
-    # -------------------------------------------------------------
-    # NOME DINÂMICO USANDO OS OBJETOS DE DATA REAIS
-    # -------------------------------------------------------------
     if not st.session_state.df.empty:
         primeira_data = st.session_state.df["_data_obj"].min()
         ultima_data = st.session_state.df["_data_obj"].max()
 
-        # Garante que min() e max() retornem objetos de data válidos
         if hasattr(primeira_data, "strftime"):
             p_str = primeira_data.strftime("%d-%m")
             u_str = ultima_data.strftime("%d-%m")
             BARRA = "∕"
         else:
-            # Fallback caso seja string por algum motivo legado
             p_str = str(primeira_data)[:5].replace("-", BARRA)
             u_str = str(ultima_data)[:5].replace("-", BARRA)
 
@@ -426,25 +414,26 @@ def finalizar():
             st.session_state.nome_excel = f"Elegibilidade - {p_str} à {u_str}.xlsx"
     else:
         st.session_state.nome_excel = "Elegibilidade.xlsx"
-    # -------------------------------------------------------------
 
     output = BytesIO()
 
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
 
+        # Lista de colunas internas/auxiliares para remover antes de exportar
+        colunas_internas = ["_unidade", "_data_obj"]
+
         #====================================
         #|| Aba 'Brasília III' na planilha ||
         #====================================
         
-        df_bsb = st.session_state.df[st.session_state.df["_unidade"] == "Brasília III"].drop(columns="_unidade") # Seleção apenas dos pacientes salvos em Brasília III
-        df_bsb_conv = df_bsb.copy() # Cria uma cópia para identificar quais convênios devem ser exportados
+        # Remove _unidade e _data_obj antes de exportar
+        df_bsb = st.session_state.df[st.session_state.df["_unidade"] == "Brasília III"].drop(columns=colunas_internas)
+        df_bsb_conv = df_bsb.copy()
         df_bsb_conv["_convenio"] = df_bsb_conv["Convênio"].apply(identificar_convenio)
 
-        # Mantém apenas os convênios válidos
         df_bsb_conv = df_bsb_conv[df_bsb_conv["_convenio"].notna()]
         df_bsb_conv = df_bsb_conv.drop(columns="_convenio")
 
-        # Exporta a aba apenas se houver registros
         if not df_bsb_conv.empty:
             df_bsb_conv.to_excel(writer, sheet_name = "Brasília III", index = False)
             worksheet = writer.sheets["Brasília III"]
@@ -455,31 +444,22 @@ def finalizar():
         #|| Aba 'Itaim' na planilha ||
         #=============================
         
-        df_itaim = st.session_state.df[st.session_state.df["_unidade"] == "Itaim"].drop(columns = "_unidade").copy() # Seleção apenas dos pacientes salvos em Itaim
+        # Remove _unidade e _data_obj antes de exportar
+        df_itaim = st.session_state.df[st.session_state.df["_unidade"] == "Itaim"].drop(columns=colunas_internas).copy()
 
         if not df_itaim.empty:
-
-            
-            #Identifica se cada paciente pertence a uma empresa específica.
-            #Quando não pertence, o valor permanece nulo e será tratado
-            #posteriormente como um convênio comum.
-            
             df_itaim["_sheet"] = df_itaim["Convênio"].apply(identificar_empresa)
 
-            # Registros sem empresa específica são destinados à aba "Convênios"
             df_convenios = df_itaim[df_itaim["_sheet"].isna()].drop(columns = "_sheet").copy()
 
-            # Filtra apenas os convênios válidos para exportação
             df_convenios["_convenio"] = df_convenios["Convênio"].apply(identificar_convenio)
             df_convenios = df_convenios[df_convenios["_convenio"].notna()]
 
-            # Exporta a aba "Convênios"
             df_convenios.drop(columns = "_convenio").to_excel(writer, sheet_name = "Convênios", index = False)
             worksheet = writer.sheets["Convênios"]
             estilizar_header(worksheet)
             estilizar_validacoes(worksheet)
 
-            # Cria automaticamente uma aba para cada empresa encontrada
             for empresa in df_itaim["_sheet"].dropna().unique():
                 df_itaim[df_itaim["_sheet"] == empresa].drop(columns = "_sheet").to_excel(writer, sheet_name = empresa, index = False)
                 worksheet = writer.sheets[empresa]

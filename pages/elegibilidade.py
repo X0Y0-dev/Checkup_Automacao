@@ -308,7 +308,7 @@ def adicionar():
 
     # Define quais colunas identificam unicamente um paciente
     chave = ["Paciente", "Convênio"]
-    novo_df = novo_df._duplicates(subset = chave, keep = "first") # Remoção de duplicatas, mantendo a primeira adicionada
+    novo_df = novo_df.drop_duplicates(subset = chave, keep = "first") # Remoção de duplicatas, mantendo a primeira adicionada
 
     # Só verifica duplicatas caso já existam registros salvos
     if not st.session_state.df.empty:
